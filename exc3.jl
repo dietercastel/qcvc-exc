@@ -7,7 +7,7 @@ X = [0 1 ; 1 0]
 
 # Quantum Hadamard Gate
 s = UniformScaling(1/sqrt(2))
-H = s * [1 ; 1 ; 1 -1]
+H = s * [1 1 ; 1 -1]
 
 #Explain why the output from this circuit is XH|\psi\rangleXH∣ψ⟩, not HX|\psi\rangleHX∣ψ⟩, as you might naively assume if you wrote down gates in the order they occur in the circuit.
 
