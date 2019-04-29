@@ -1,4 +1,4 @@
-# Let H be the Haddamard matrix (for the haddamard quantum gate):
+# Let H be the Hadamard matrix (for the haddamard quantum gate):
 # Verify that H * H = I where I is the 2x2 identity matrix
 
 s = UniformScaling(1/sqrt(2))
