@@ -1,6 +1,8 @@
 # Exercise 2:
 # Assume that instead of the Hadamard matrix we define J as follows:
 
+using LinearAlgebra
+
 s = UniformScaling(1/sqrt(2))
 J = s * [1 1; 1 1]
 
