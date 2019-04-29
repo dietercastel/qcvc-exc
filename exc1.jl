@@ -1,6 +1,8 @@
 # Exercise 1:
 # Let H be the Hadamard matrix (for the hadamard quantum gate):
 
+using LinearAlgebra
+
 s = UniformScaling(1/sqrt(2))
 
 println(s)
