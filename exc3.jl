@@ -2,6 +2,8 @@
 # Consider the following quantum circuit:
 # | \psi > ---| H |---| X |---
 
+using LinearAlgebra
+
 # Quantum not gate
 X = [0 1 ; 1 0]
 
