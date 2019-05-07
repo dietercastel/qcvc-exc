@@ -17,4 +17,8 @@ Ans = H * H
 
 println(Ans)
 
+@testset "H is unitary"
+	@test Ans == [1 0; 0 1]
+end;
+
 # Indeed this results in Ans being the Idenity matrix [1 0; 0 1]
