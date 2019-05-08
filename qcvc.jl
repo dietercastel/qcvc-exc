@@ -1,6 +1,6 @@
 module QC
 
-export X,Y,Z,H, s1sqrt2
+export X,Y,Z,H, s1sqrt2, ketPlus, ketMin
 
 using LinearAlgebra
 
@@ -17,5 +17,9 @@ Z = [ 1 0 ; 0 -1]
 
 s1sqrt2 = UniformScaling(1/sqrt(2))
 H= s1sqrt2 * [1 1; 1 -1]
+
+
+ketPlus = s1sqrt2 * [1 ; 1]
+ketMin = s1sqrt2 * [1 ; -1] 
 
 end
