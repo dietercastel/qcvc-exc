@@ -2,15 +2,81 @@ include("./qcvc.jl")
 using .QC
 using Test
 
-# Takes two qubits (1x2) as input and returns the 2 qubit computational basis vector as output (1x4). 
-one2two(a,b) = reshape(transpose(kron(a,transpose(b))), 4)
+# Takes two qubits (2x1) as input and returns the 2 qubit computational basis vector as output (1x4). 
+one2two(a,b) = reshape(transpose(kron(a,transpose(b))), 2^2)
+# Takes a 2-qubit state and a (1x2) as input and returns the 2 qubit computational basis vector as output (1x4). 
+two2three(a,b) = reshape(transpose(kron(a,transpose(b))), 2^3)
 
+
+
+# Extends the state of n qbits (length 2^n) with an extra qbit (of length 2)
+# resulting in a new n+1 qbit state (length 2^n+1)
+
+
+iswhole(x) = round(x) == x 
+
+@testset "wholeness" begin
+	@test iswhole(1.0) == true
+	@test iswhole(1.1) == false 
+	@test iswhole(10.0) == true
+	@test iswhole(10.9) == false 
+	@test iswhole(-10.9) == false 
+	@test iswhole(-10.0) == true 
+end;
+
+function extendState(qbits, newqbit)
+	qbitslen = size(qbits)[1]
+	println(qbitslen)
+	statedim = log2(qbitslen) 
+	println(statedim)
+	if !iswhole(statedim) || statedim<1 || length(size(qbits)) != 1
+		throw(ArgumentError("First argument should be a column vector of size 2^nx1 where n is at least 1."))
+	end
+	if size(newqbit) != (2,)
+		throw(ArgumentError("Second argument should be a column vector of size 2x1"))
+	end
+	return reshape(transpose(kron(qbits,transpose(newqbit))), 2*qbitslen)
+end
 
 e1_0 = [ 1; 0 ]
 e1_1 = [ 0; 1 ]
 println(size(one2two(e1_0,e1_1)))
 println(one2two(ketPlus,ketMin))
 
+###
+#
+#  1 - H - | - > ---.------- ?? H - m =
+#					| CNOT
+#  1 - H - | - > ---0------- ?? H - m =
+###
+
+
+
+res = H * e1_1
+println(res)
+println(length(res))
+println(size(res))
+res = one2two(H * e1_1,H * e1_1)
+println(res)
+println(length(res))
+println(size(res))
+
+println(two2three(res,e1_0))
+
+
+v2 = [1 ; 0]
+v3 = [ 1; 2; 3 ]
+v4 =  [0; 1; 0; 0]
+v4x2 =  [0 2; 1 2; 0 2; 0 2]
+
+@testset "invalidsizes" begin
+	@test_throws ArgumentError extendState(v4,v4) 
+	@test_throws ArgumentError extendState(v4x2,v2) 
+	@test_throws ArgumentError extendState(v2,v4) 
+	@test_throws ArgumentError extendState(v3,v2) 
+end;
+
+#=
 @testset "tests" begin
 	@test size(one2two(e1_0,e1_1)) == (4,) 
 	@test one2two(e1_0,e1_1) == [0; 1; 0; 0]
@@ -22,6 +88,7 @@ println(one2two(ketPlus,ketMin))
 	@test one2two(e1_1,e1_1) == [0; 0; 0; 1]
 	@test size(one2two(ketPlus,ketMin)) == (4,) 
 	@test one2two(ketPlus,ketMin) == [0.5; -0.5; 0.5; -0.5]
+	@test typeof(one2two(ketPlus,ketMin)) == typeof([0.5; -0.5; 0.5; -0.5])
 	@test size(one2two(ketPlus,ketPlus)) == (4,) 
 	@test one2two(ketPlus,ketPlus) == [0.5; 0.5; 0.5; 0.5]
 	@test size(one2two(ketMin,ketPlus)) == (4,) 
@@ -29,3 +96,4 @@ println(one2two(ketPlus,ketMin))
 	@test size(one2two(ketMin,ketMin)) == (4,) 
 	@test one2two(ketMin,ketMin) == [0.5; -0.5; -0.5; 0.5]
 end; 
+=#
