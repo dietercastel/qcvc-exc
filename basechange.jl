@@ -1,6 +1,7 @@
 include("./qcvc.jl")
 using .QC
 using Test
+using LinearAlgebra 
 
 # Takes two qubits (2x1) as input and returns the 2 qubit computational basis vector as output (1x4). 
 one2two(a,b) = reshape(transpose(kron(a,transpose(b))), 2^2)
@@ -9,12 +10,9 @@ two2three(a,b) = reshape(transpose(kron(a,transpose(b))), 2^3)
 
 
 
-# Extends the state of n qbits (length 2^n) with an extra qbit (of length 2)
-# resulting in a new n+1 qbit state (length 2^n+1)
 
 
 iswhole(x) = round(x) == x 
-
 @testset "wholeness" begin
 	@test iswhole(1.0) == true
 	@test iswhole(1.1) == false 
@@ -22,8 +20,14 @@ iswhole(x) = round(x) == x
 	@test iswhole(10.9) == false 
 	@test iswhole(-10.9) == false 
 	@test iswhole(-10.0) == true 
+	@test iswhole(3333333333.3) == false 
+	@test iswhole(3333333333.0) == true 
 end;
 
+
+
+# Extends the state of n qbits (length 2^n) with an extra qbit (of length 2)
+# resulting in a new n+1 qbit state (length 2^n+1)
 function extendState(qbits, newqbit)
 	qbitslen = size(qbits)[1]
 	println(qbitslen)
@@ -76,18 +80,36 @@ v4x2 =  [0 2; 1 2; 0 2; 0 2]
 	@test_throws ArgumentError extendState(v3,v2) 
 end;
 
+println("stuff")
+
+println(extendState(ketPlus,ketMin) .== [0.5; -0.5; 0.5; -0.5])
+println(bitstring(0.5))
+println(extendState(ketPlus,ketMin)[1])
+println(bitstring(extendState(ketPlus,ketMin)[1]))
+println(bitstring(extendState(ketPlus,ketMin)[2]))
+println(bitstring(extendState(ketPlus,ketMin)[3]))
+
+@testset "extendState to two qubits" begin
+	@test size(extendState(e1_0,e1_1)) == (4,) 
+	@test extendState(e1_0,e1_1) == [0; 1; 0; 0]
+	@test size(extendState(e1_0,e1_0)) == (4,) 
+	@test extendState(e1_0,e1_0) == [1; 0; 0; 0]
+	@test size(extendState(e1_1,e1_0)) == (4,) 
+	@test extendState(e1_1,e1_0) == [0; 0; 1; 0]
+	@test size(extendState(e1_1,e1_1)) == (4,) 
+	@test extendState(e1_1,e1_1) == [0; 0; 0; 1]
+	pm = extendState(ketPlus,ketMin)
+	@test size(pm) == (4,) 
+	@test isapprox(pm,[0.5; -0.5; 0.5; -0.5])
+	@test isapprox(norm(pm),1)
+	@test size(one2two(ketPlus,ketPlus)) == (4,) 
+	@test isapprox(one2two(ketPlus,ketPlus),[0.5; 0.5; 0.5; 0.5])
+	@test size(one2two(ketMin,ketPlus)) == (4,) 
+	@test isapprox(one2two(ketMin,ketPlus),[0.5; 0.5; -0.5; -0.5])
+	@test size(one2two(ketMin,ketMin)) == (4,) 
+	@test isapprox(one2two(ketMin,ketMin),[0.5; -0.5; -0.5; 0.5])
+end;
 #=
-@testset "tests" begin
-	@test size(one2two(e1_0,e1_1)) == (4,) 
-	@test one2two(e1_0,e1_1) == [0; 1; 0; 0]
-	@test size(one2two(e1_0,e1_0)) == (4,) 
-	@test one2two(e1_0,e1_0) == [1; 0; 0; 0]
-	@test size(one2two(e1_1,e1_0)) == (4,) 
-	@test one2two(e1_1,e1_0) == [0; 0; 1; 0]
-	@test size(one2two(e1_1,e1_1)) == (4,) 
-	@test one2two(e1_1,e1_1) == [0; 0; 0; 1]
-	@test size(one2two(ketPlus,ketMin)) == (4,) 
-	@test one2two(ketPlus,ketMin) == [0.5; -0.5; 0.5; -0.5]
 	@test typeof(one2two(ketPlus,ketMin)) == typeof([0.5; -0.5; 0.5; -0.5])
 	@test size(one2two(ketPlus,ketPlus)) == (4,) 
 	@test one2two(ketPlus,ketPlus) == [0.5; 0.5; 0.5; 0.5]
