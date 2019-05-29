@@ -9,9 +9,6 @@ one2two(a,b) = reshape(transpose(kron(a,transpose(b))), 2^2)
 two2three(a,b) = reshape(transpose(kron(a,transpose(b))), 2^3)
 
 
-
-
-
 iswhole(x) = round(x) == x 
 @testset "wholeness" begin
 	@test iswhole(1.0) == true
@@ -25,15 +22,44 @@ iswhole(x) = round(x) == x
 end;
 
 
+function isPow2len(v::Vector)
+	dim1len = size(v)[1]
+	return dim1len >= 2 && ispow2(dim1len) 
+end
+
+function isPow2len2(v::Vector)
+	dim1len = size(v)[1]
+	logLen = log2(dim1len)
+	return logLen >= 1 && iswhole(logLen)
+end
+
+@time isPow2len([1;0;0;0;1;0;1;1])
+@time isPow2len2([1;0;0;0;1;0;1;1])
+
+@testset "isPow2len" begin
+	@test isPow2len([]) == false
+	@test isPow2len([1]) == false
+	@test isPow2len([1;2]) == true 
+	@test isPow2len([1;2;3]) == false 
+	@test isPow2len([1;2;3;4]) == true 
+	@test isPow2len([1;2;3;4;5]) == false 
+	@test isPow2len([1;2;3;4;5;6;]) == false 
+	@test isPow2len([1;2;3;4;5;6;7]) == false 
+	@test isPow2len([1;2;3;4;5;6;7;8]) == true 
+end;
+
 
 # Extends the state of n qbits (length 2^n) with an extra qbit (of length 2)
 # resulting in a new n+1 qbit state (length 2^n+1)
 function extendState(qbits, newqbit)
 	qbitslen = size(qbits)[1]
-	println(qbitslen)
+	#println(qbitslen)
 	statedim = log2(qbitslen) 
-	println(statedim)
-	if !iswhole(statedim) || statedim<1 || length(size(qbits)) != 1
+	#println(statedim)
+	println(size(qbits))
+	println(length(size(qbits)))
+	if !isPow2len(qbits) || length(size(qbits)) != 1
+		println("in")
 		throw(ArgumentError("First argument should be a column vector of size 2^nx1 where n is at least 1."))
 	end
 	if size(newqbit) != (2,)
